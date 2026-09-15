@@ -1,7 +1,17 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../../config/authConfig';
 
 export default function Login() {
+  const { instance } = useMsal();
+
+  const handleLogin = () => {
+    instance.loginRedirect(loginRequest).catch(e => {
+      console.error(e);
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans text-slate-800 relative">
       {/* Fondo con los puntos de decoracion */}
@@ -15,7 +25,7 @@ export default function Login() {
             {/* Texto Superior */}
             <div className="text-center mb-8">
               <h1 className="text-4xl font-extrabold text-slate-900 leading-tight mb-3">Administración de Ordenes de Trabajo</h1>
-              <p className="text-slate-600 font-medium text-base leading-relaxed"> Plataforma para órdenes de trabajo de mantención eléctrica.</p>            
+              <p className="text-slate-600 font-medium text-base leading-relaxed"> Plataforma para órdenes de trabajo de mantención eléctrica.</p>
             </div>
             {/* Login */}
             <div className="bg-white rounded-[16px] p-8 lg:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-slate-300 w-full text-center relative overflow-hidden">
@@ -28,9 +38,7 @@ export default function Login() {
                 Identifícate con tus credenciales corporativas para acceder
               </p>
               {/* Boton Microsoft */}
-              <button
-                className="mt-8 w-full flex items-center justify-center gap-3 border border-slate-300 bg-white rounded-xl py-3 px-4 font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all shadow-sm"
-              >
+              <button onClick={handleLogin} className="mt-8 w-full flex items-center justify-center gap-3 border border-slate-300 bg-white rounded-xl py-3 px-4 font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all shadow-sm">
                 <img
                   src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg"
                   alt="Microsoft Logo"
@@ -44,7 +52,7 @@ export default function Login() {
                 </p>
               </div>
             </div>
-            
+
           </div>
         </main>
         <Footer />
