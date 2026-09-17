@@ -2,8 +2,7 @@ import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 export default function Header() {
   const isAuthenticated = useIsAuthenticated();
   const { instance, accounts } = useMsal();
-
-  // Esto es para cerrar la sesion una vez iniciada en la pagina
+ 
   const handleLogout = () => {
     instance.logoutRedirect();
   };
@@ -13,8 +12,7 @@ export default function Header() {
       <div className="flex items-center gap-3">
         <span className="font-bold text-slate-900 tracking-tight text-xl">DigitalFix</span>
       </div>
-      
-      {/* Verificamos si inicio sesion, si es asi este se mostrara en el header los datos */}
+       
       {isAuthenticated && accounts.length > 0 && (
         <div className="flex items-center gap-4">
           <div className="hidden md:flex flex-col text-right">
