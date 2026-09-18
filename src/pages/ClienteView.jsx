@@ -1,6 +1,40 @@
 import { PlusCircle, Clock, MapPin, Wrench } from 'lucide-react';
+import { useState } from 'react';
+import { useMsal } from '@azure/msal-react';
+import { workOrdersApi } from '../services/api';
 
 export default function ClienteView() {
+    const { instance, accounts } = useMsal();
+    const [direccion, setDireccion] = useState('');
+    const [descripcion, setDescripcion] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ text: '', type: '' });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!direccion || !descripcion) {
+            setMessage({ text: 'Por favor completa todos los campos', type: 'error' });
+            return;
+        }
+        setLoading(true);
+        setMessage({ text: '', type: '' });
+        try {
+            const order = {
+                clienteId: accounts[0]?.localAccountId || accounts[0]?.username || 'desconocido',
+                clienteNombre: accounts[0]?.name || 'Cliente Desconocido',
+                direccion: direccion,
+                descripcion: descripcion
+            };
+            await workOrdersApi.create(instance, order);
+            setMessage({ text: 'Enviado correcto', type: 'success' });
+            setDireccion('');
+            setDescripcion('');
+        } catch (error) {
+            setMessage({ text: error.message, type: 'error' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="p-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
@@ -9,16 +43,22 @@ export default function ClienteView() {
                         <Wrench className="text-blue-600" />
                         <h2 className="text-xl font-bold">Nueva Solicitud</h2>
                     </div>
-                    <form className="flex flex-col gap-5">
+                    {message.text && (
+                        <div className={`mb-4 p-3 rounded-lg text-sm ${message.type === 'error' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
+                            {message.text}
+                        </div>
+                    )}
+                    <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-1">
                                 Dirección
                             </label>
                             <input 
                                 type="text" 
-                                readOnly
-                                className="w-full border-2 border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-slate-50"
-                                placeholder="Antonio Varas 666" 
+                                value={direccion}
+                                onChange={(e) => setDireccion(e.target.value)}
+                                className="w-full border-2 border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white"
+                                placeholder="Ej. Antonio Varas 666" 
                             />
                         </div>
 
@@ -27,19 +67,21 @@ export default function ClienteView() {
                                 Descripción de la falla
                             </label>
                             <textarea 
-                                readOnly
-                                className="w-full border-2 border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-slate-50" 
+                                value={descripcion}
+                                onChange={(e) => setDescripcion(e.target.value)}
+                                className="w-full border-2 border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white" 
                                 rows="4"
                                 placeholder="Describe el problema eléctrico detalladamente..."
                             ></textarea>
                         </div>
 
                         <button 
-                            type="button" 
-                            className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-sm flex items-center justify-center gap-2 transition-colors opacity-70 cursor-not-allowed"
+                            type="submit" 
+                            disabled={loading}
+                            className={`mt-2 w-full font-semibold py-3 px-4 rounded-lg shadow-sm flex items-center justify-center gap-2 transition-colors ${loading ? 'bg-blue-400 cursor-not-allowed text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
                         >
-                            <PlusCircle size={18} />
-                            Enviar Solicitud
+                            <PlusCircle size={18} className={loading ? 'animate-spin' : ''} />
+                            {loading ? 'Enviando...' : 'Enviar Solicitud'}
                         </button>
                     </form>
                 </div>

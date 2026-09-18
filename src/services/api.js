@@ -24,6 +24,7 @@ export async function apiFetch(msalInstance, endpoint, options = {}) {
         "Authorization": `Bearer ${tokenResponse.accessToken}`,
         ...options.headers,
     };
+    console.log("TOKEN ACCESS:", tokenResponse.accessToken);
 
     try {
         const response = await axios({

@@ -1,4 +1,26 @@
+import { CheckCircle, Clock, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useMsal } from '@azure/msal-react';
+import { workOrdersApi } from '../services/api';
+
 export default function SupervisorView() {
+    const { instance } = useMsal();
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const data = await workOrdersApi.getAll(instance);
+                setOrders(data || []);
+            } catch (error) {
+                console.error("Error al recuperar los pedidos:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOrders();
+    }, [instance]);
+
     return (
         <div className="p-6 max-w-7xl mx-auto flex flex-col gap-8">
             <div>
@@ -25,14 +47,27 @@ export default function SupervisorView() {
                             <th className="px-6 py-4 font-semibold">Cliente</th>
                             <th className="px-6 py-4 font-semibold">Dirección</th>
                             <th className="px-6 py-4 font-semibold">Técnico</th>
-                            <th className="px-6 py-4 font-semibold">Estado</th>
-                            <th className="px-6 py-4 font-semibold">Acciones</th>
                         </tr>
                     </thead>
                     <tbody className="text-sm divide-y divide-slate-100">
-                        <tr>
-                            <td colSpan="6" className="px-6 py-8 text-center text-slate-500">Tabla de órdenes vacía</td>
-                        </tr>
+                        {loading ? (
+                            <tr>
+                                <td colSpan="6" className="px-6 py-8 text-center text-slate-500">Cargando solicitudes...</td>
+                            </tr>
+                        ) : orders.length === 0 ? (
+                            <tr>
+                                <td colSpan="6" className="px-6 py-8 text-center text-slate-500">Tabla de órdenes vacía</td>
+                            </tr>
+                        ) : (
+                            orders.map((order) => (
+                                <tr key={order.id} className="hover:bg-slate-50 transition-colors">
+                                    <td className="px-6 py-4 font-medium text-slate-900">#{order.id}</td>
+                                    <td className="px-6 py-4">{order.clienteNombre || order.clienteId}</td>
+                                    <td className="px-6 py-4">{order.direccion}</td>
+                                    <td className="px-6 py-4 text-slate-500">{order.tecnicoAsignado || 'Sin asignar'}</td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
