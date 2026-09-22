@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { loginRequest } from "../config/authConfig";
 
-const BFF_URL = "http://localhost:8081";
+const BFF_URL = "https://czlh828dof.execute-api.us-east-1.amazonaws.com";
 
 export async function apiFetch(msalInstance, endpoint, options = {}) {
     const accounts = msalInstance.getAllAccounts();
