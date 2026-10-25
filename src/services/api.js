@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { loginRequest } from "../config/authConfig";
 
-const BFF_URL = "https://czlh828dof.execute-api.us-east-1.amazonaws.com";
+// direccion del bff obtenida de las variables de entorno
+const BFF_URL = import.meta.env.VITE_BFF_URL || "";
 
+// peticion general al backend con token de autorizacion
 export async function apiFetch(msalInstance, endpoint, options = {}) {
     const accounts = msalInstance.getAllAccounts();
     if (accounts.length === 0) {
@@ -40,6 +42,7 @@ export async function apiFetch(msalInstance, endpoint, options = {}) {
     }
 }
 
+//leer los roles del usuario desde el token jwt
 export async function getBackendRoles(msalInstance) {
     const accounts = msalInstance.getAllAccounts();
     if (accounts.length === 0) return [];
@@ -62,6 +65,7 @@ export async function getBackendRoles(msalInstance) {
     }
 }
 
+//llamadas a la api para el catalogo
 export const catalogApi = {
     getAll: (msalInstance) => apiFetch(msalInstance, "/api/catalog/services"),
     
@@ -71,6 +75,7 @@ export const catalogApi = {
     }),
 };
 
+// llamadas a la api para las ordenes de trabajo
 export const workOrdersApi = {
     getAll: (msalInstance) => apiFetch(msalInstance, "/api/workorders"),
     

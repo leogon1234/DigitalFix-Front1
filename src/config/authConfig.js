@@ -1,8 +1,9 @@
+//configuracion para iniciar sesion con microsoft
 export const msalConfig = {
     auth: {
-        clientId: "0e35cff9-911b-406a-9b11-d66d59b85c24",
-        authority: "https://login.microsoftonline.com/72fd0b5a-8a6a-4cff-89f6-bde961f7e250",
-        redirectUri: "https://ec2-54-163-195-44.compute-1.amazonaws.com",
+        clientId: import.meta.env.VITE_AZURE_CLIENT_ID || "",
+        authority: import.meta.env.VITE_AZURE_AUTHORITY || "",
+        redirectUri: import.meta.env.VITE_AZURE_REDIRECT_URI || window.location.origin,
     },
     cache: {
         cacheLocation: "sessionStorage",
@@ -10,9 +11,10 @@ export const msalConfig = {
     }
 };
 
+//permisos para consultar y guardar datos en la api
 export const loginRequest = {
     scopes: [
-        "api://b6ae697f-8030-4a0a-88db-670d6611fbb6/read",
-        "api://b6ae697f-8030-4a0a-88db-670d6611fbb6/write"
-    ]
+        import.meta.env.VITE_AZURE_SCOPE_READ,
+        import.meta.env.VITE_AZURE_SCOPE_WRITE,
+    ].filter(Boolean)
 };
