@@ -2,6 +2,8 @@ import { PlusCircle, Wrench, RefreshCw, MapPin, AlertCircle } from 'lucide-react
 import { useState, useEffect } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { workOrdersApi } from '../services/api';
+import EtiquetaEstado from '../components/EtiquetaEstado';
+import AlertaMensaje from '../components/AlertaMensaje';
 
 export default function ClienteView() {
     const { instance, accounts } = useMsal();
@@ -86,26 +88,6 @@ export default function ClienteView() {
         }
     };
 
-    const getEstadoStyle = (estado) => {
-        const e = (estado || '').replace('Ó', 'O');
-        switch (e) {
-            case 'ASIGNADA':
-                return 'bg-blue-800 text-white border-blue-800';
-            case 'EN_DESPLAZAMIENTO':
-                return 'bg-sky-800 text-white border-sky-800';
-            case 'EN_EJECUCION':
-                return 'bg-orange-800 text-white border-orange-800';
-            case 'CERRADA':
-            case 'COMPLETADA':
-                return 'bg-green-800 text-white border-green-800';
-            case 'CANCELADA':
-                return 'bg-rose-900 text-white border-rose-900';
-            case 'CREADA':
-            default:
-                return 'bg-slate-700 text-white border-slate-700';
-        }
-    };
-
     const finalizados = ['CERRADA', 'CANCELADA'];
     const ordenesActivas = ordenes.filter(o => !finalizados.includes((o.estado || '').replace('Ó', 'O')));
     const ordenesFinalizadas = ordenes.filter(o => finalizados.includes((o.estado || '').replace('Ó', 'O')));
@@ -120,15 +102,7 @@ export default function ClienteView() {
                         <h2 className="text-xl font-bold tracking-tight">Nueva Solicitud</h2>
                     </div>
 
-                    {message.text && (
-                        <div className={`mb-4 p-3 rounded-[10px] text-xs font-mono border ${
-                            message.type === 'error'
-                                ? 'bg-rose-900 text-white border-rose-900'
-                                : 'bg-green-800 text-white border-green-800'
-                        }`}>
-                            {message.text}
-                        </div>
-                    )}
+                    <AlertaMensaje mensaje={message} className="mb-4" />
 
                     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                         <div>
@@ -222,9 +196,7 @@ export default function ClienteView() {
                                         <div className="space-y-1">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-mono font-bold text-slate-900 text-base">#{orden.id}</span>
-                                                <span className={`inline-block px-2.5 py-0.5 text-xs font-mono font-semibold uppercase tracking-wider border rounded-[10px] ${getEstadoStyle(orden.estado)}`}>
-                                                    {orden.estado || 'CREADA'}
-                                                </span>
+                                                <EtiquetaEstado estado={orden.estado} />
                                             </div>
                                             <div className="flex items-center text-xs text-black gap-1.5">
                                                 <MapPin size={13} className="text-black" />

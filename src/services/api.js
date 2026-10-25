@@ -22,23 +22,30 @@ export async function apiFetch(msalInstance, endpoint, options = {}) {
     }
 
     const headers = {
-        "Content-Type": "application/json",
         "Authorization": `Bearer ${tokenResponse.accessToken}`,
         ...options.headers,
     };
+    if (options.body || options.data) {
+        headers["Content-Type"] = "application/json";
+    }
     console.log("TOKEN ACCESS:", tokenResponse.accessToken);
+
+    const payload = options.body 
+        ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body)
+        : (options.data || undefined);
 
     try {
         const response = await axios({
             url: `${BFF_URL}${endpoint}`,
             method: options.method || 'GET',
             headers,
-            data: options.body ? JSON.parse(options.body) : undefined,
+            data: payload,
         });
         return response.data;
     } catch (error) {
-        console.error("API call error:", error);
-        throw new Error(`Error ${error.response?.status || 'desconocido'}: Acceso denegado o falla en servidor`);
+        console.error("API call error en", endpoint, ":", error.response?.status, error.response?.data || error.message);
+        const serverMsg = error.response?.data?.message || (typeof error.response?.data === 'string' ? error.response.data : '');
+        throw new Error(serverMsg || 'Acceso denegado o falla en servidor');
     }
 }
 
@@ -71,6 +78,11 @@ export const catalogApi = {
     
     create: (msalInstance, item) => apiFetch(msalInstance, "/api/catalog/services", {
         method: "POST",
+        body: JSON.stringify(item),
+    }),
+
+    update: (msalInstance, id, item) => apiFetch(msalInstance, `/api/catalog/services/${id}`, {
+        method: "PUT",
         body: JSON.stringify(item),
     }),
 };

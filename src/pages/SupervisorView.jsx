@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { Link } from 'react-router-dom';
 import { workOrdersApi } from '../services/api';
+import EtiquetaEstado from '../components/EtiquetaEstado';
+import AlertaMensaje from '../components/AlertaMensaje';
 
 export default function SupervisorView() {
     const { instance } = useMsal();
@@ -56,26 +58,6 @@ export default function SupervisorView() {
         }
     };
 
-    const getEstadoStyle = (estado) => {
-        const e = (estado || '').replace('Ó', 'O');
-        switch (e) {
-            case 'ASIGNADA':
-                return 'bg-blue-800 text-white border-blue-800';
-            case 'EN_DESPLAZAMIENTO':
-                return 'bg-sky-800 text-white border-sky-800';
-            case 'EN_EJECUCION':
-                return 'bg-orange-800 text-white border-orange-800';
-            case 'CERRADA':
-            case 'COMPLETADA':
-                return 'bg-green-800 text-white border-green-800';
-            case 'CANCELADA':
-                return 'bg-rose-900 text-white border-rose-900';
-            case 'CREADA':
-            default:
-                return 'bg-slate-700 text-white border-slate-700';
-        }
-    };
-
     const ordenesFiltradas = ordenes.filter((orden) => {
         const estado = (orden.estado || '').replace('Ó', 'O');
         if (filtroActivo === 'PENDIENTES') return estado === 'CREADA';
@@ -121,15 +103,7 @@ export default function SupervisorView() {
                 </div>
             </div>
 
-            {mensaje.text && (
-                <div className={`mb-6 p-3 rounded-[10px] text-xs font-mono border ${
-                    mensaje.type === 'error'
-                        ? 'bg-rose-900 text-white border-rose-900'
-                        : 'bg-green-800 text-white border-green-800'
-                }`}>
-                    {mensaje.text}
-                </div>
-            )}
+            <AlertaMensaje mensaje={mensaje} className="mb-6" />
 
             <div className="flex flex-wrap gap-2 mb-6">
                 {[
@@ -166,9 +140,7 @@ export default function SupervisorView() {
                                 <div>
                                     <div className="flex justify-between items-start mb-2">
                                         <span className="font-mono font-bold text-slate-900 text-base">#{orden.id}</span>
-                                        <span className={`inline-block px-2.5 py-0.5 text-xs font-mono font-semibold uppercase tracking-wider border rounded-[10px] ${getEstadoStyle(orden.estado)}`}>
-                                            {orden.estado}
-                                        </span>
+                                        <EtiquetaEstado estado={orden.estado} />
                                     </div>
 
                                     <div className="text-xs space-y-1 mt-2 text-black">
