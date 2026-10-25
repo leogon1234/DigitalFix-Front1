@@ -6,6 +6,7 @@ import { useAccount, useMsal } from '@azure/msal-react';
 import AdminView from './AdminView';
 import SupervisorView from './SupervisorView';
 import ClienteView from './ClienteView';
+import { CatalogList } from '../components/CatalogList';
 import { getBackendRoles } from '../services/api';
 import { Loader2 } from 'lucide-react';
 
@@ -40,6 +41,7 @@ export default function Dashboard() {
             <main className="flex-grow">
                 <Routes>
                     <Route path="/" element={<DefaultView />} />
+                    <Route path="/catalog" element={<CatalogList />} />
                 </Routes>
             </main>
         </div>

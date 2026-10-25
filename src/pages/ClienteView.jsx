@@ -86,6 +86,26 @@ export default function ClienteView() {
         }
     };
 
+    const getEstadoStyle = (estado) => {
+        const e = (estado || '').replace('Ó', 'O');
+        switch (e) {
+            case 'ASIGNADA':
+                return 'bg-blue-800 text-white border-blue-800';
+            case 'EN_DESPLAZAMIENTO':
+                return 'bg-sky-800 text-white border-sky-800';
+            case 'EN_EJECUCION':
+                return 'bg-orange-800 text-white border-orange-800';
+            case 'CERRADA':
+            case 'COMPLETADA':
+                return 'bg-green-800 text-white border-green-800';
+            case 'CANCELADA':
+                return 'bg-rose-900 text-white border-rose-900';
+            case 'CREADA':
+            default:
+                return 'bg-slate-700 text-white border-slate-700';
+        }
+    };
+
     const finalizados = ['CERRADA', 'CANCELADA'];
     const ordenesActivas = ordenes.filter(o => !finalizados.includes((o.estado || '').replace('Ó', 'O')));
     const ordenesFinalizadas = ordenes.filter(o => finalizados.includes((o.estado || '').replace('Ó', 'O')));
@@ -101,7 +121,11 @@ export default function ClienteView() {
                     </div>
 
                     {message.text && (
-                        <div className={`mb-4 p-3 rounded-md text-sm border ${message.type === 'error' ? 'bg-red-50 text-red-700 border-red-300' : 'bg-green-50 text-green-700 border-green-300'}`}>
+                        <div className={`mb-4 p-3 rounded-[10px] text-xs font-mono border ${
+                            message.type === 'error'
+                                ? 'bg-rose-900 text-white border-rose-900'
+                                : 'bg-green-800 text-white border-green-800'
+                        }`}>
                             {message.text}
                         </div>
                     )}
@@ -198,24 +222,18 @@ export default function ClienteView() {
                                         <div className="space-y-1">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-mono font-bold text-slate-900 text-base">#{orden.id}</span>
-                                                <span className={`inline-block px-2 py-0.5 text-xs font-mono font-semibold uppercase tracking-wider border rounded-xs ${
-                                                    esCancelada ? 'border-red-600 text-red-800 bg-red-50' :
-                                                    orden.estado === 'CERRADA' ? 'border-emerald-600 text-emerald-800 bg-emerald-50' :
-                                                    orden.estado === 'EN_DESPLAZAMIENTO' ? 'border-blue-600 text-blue-800 bg-blue-50' :
-                                                    orden.estado === 'EN_EJECUCION' || orden.estado === 'EN_EJECUCIÓN' ? 'border-amber-600 text-amber-800 bg-amber-50' :
-                                                    'border-slate-400 text-slate-800 bg-slate-100'
-                                                }`}>
+                                                <span className={`inline-block px-2.5 py-0.5 text-xs font-mono font-semibold uppercase tracking-wider border rounded-[10px] ${getEstadoStyle(orden.estado)}`}>
                                                     {orden.estado || 'CREADA'}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center text-xs text-slate-500 gap-1.5">
-                                                <MapPin size={13} className="text-slate-400" />
-                                                <span>{orden.direccion || 'Sin direccion'}</span>
+                                            <div className="flex items-center text-xs text-black gap-1.5">
+                                                <MapPin size={13} className="text-black" />
+                                                <span className="font-semibold text-black">{orden.direccion || 'Sin direccion'}</span>
                                             </div>
                                             {(orden.tecnicoAsignado || orden.tecnicoNombre) && (
-                                                <div className="text-xs font-mono text-slate-700 pt-1 flex items-center gap-1.5">
-                                                    <span className="text-slate-500 uppercase tracking-wider text-[11px]">Tecnico:</span>
-                                                    <span className="font-semibold text-slate-900">{orden.tecnicoAsignado || orden.tecnicoNombre}</span>
+                                                <div className="text-xs font-mono text-black pt-1 flex items-center gap-1.5">
+                                                    <span className="uppercase tracking-wider text-[11px] text-black">Tecnico:</span>
+                                                    <span className="font-semibold text-black">{orden.tecnicoAsignado || orden.tecnicoNombre}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -223,14 +241,14 @@ export default function ClienteView() {
                                         {orden.estado === 'CREADA' && (
                                             <button 
                                                 onClick={() => handleCancelar(orden.id)}
-                                                className="px-2.5 py-1 text-xs font-medium text-red-700 border border-red-300 hover:border-red-500 hover:bg-red-50 rounded-xs transition-colors"
+                                                className="px-3 py-1 text-xs font-mono font-semibold text-white bg-rose-900 hover:bg-rose-950 border border-rose-900 rounded-[10px] transition-colors shadow-xs"
                                             >
                                                 Cancelar orden
                                             </button>
                                         )}
                                     </div>
 
-                                    <p className="text-sm text-slate-700 mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xs">
+                                    <p className="text-sm text-slate-800 mt-3 p-3 bg-slate-100 border border-slate-300 rounded-[10px]">
                                         {orden.descripcionProblema || orden.descripcion}
                                     </p>
 

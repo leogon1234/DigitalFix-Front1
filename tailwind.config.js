@@ -6,8 +6,18 @@ export default {
   ],
   theme: {
     extend: {
+      borderRadius: {
+        '10': '10px',
+        xs: '10px',
+        sm: '10px',
+        md: '10px',
+        lg: '10px',
+        xl: '10px',
+        DEFAULT: '10px',
+      },
       fontFamily: {
-        sans: ['"Karla"', 'sans-serif'],
+        sans: ['Roboto', 'Arial', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
       },
     },
   },

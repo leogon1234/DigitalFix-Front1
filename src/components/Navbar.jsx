@@ -26,10 +26,10 @@ const Navbar = ({ roles = [] }) => {
                     </div>                
                     <div className="flex items-center space-x-4">
                         <div className="flex flex-col text-right hidden sm:flex justify-center">
-                            <div className="text-sm font-semibold text-gray-900 flex items-center justify-end gap-1">
+                            <div className="text-sm font-semibold text-gray-900 flex items-center justify-end gap-1.5">
                                 {name} 
                                 {rolesDisplay && (
-                                    <span className="text-[10px] uppercase tracking-wider text-black-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full">
+                                    <span className="text-xs font-normal text-slate-500 ml-1">
                                         {rolesDisplay}
                                     </span>
                                 )}
