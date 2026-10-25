@@ -3,10 +3,13 @@ import { useMsal } from '@azure/msal-react';
 import { catalogApi, workOrdersApi } from '../services/api';
 import AlertaMensaje from '../components/AlertaMensaje';
 import TarjetaMetrica from '../components/TarjetaMetrica';
-import { Wrench, PlusCircle, RefreshCw, Layers, Edit2, Check, X, Activity, CheckCircle2, AlertOctagon, Clock } from 'lucide-react';
+import ModuloAuditoria from '../components/ModuloAuditoria';
+import { Wrench, PlusCircle, RefreshCw, Layers, Edit2, Check, X, Activity, CheckCircle2, AlertOctagon, Clock, ShieldCheck } from 'lucide-react';
 
 export default function AdminView() {
     const { instance } = useMsal();
+
+    const [seccionActiva, setSeccionActiva] = useState('catalogo');
 
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
@@ -141,8 +144,32 @@ export default function AdminView() {
                 <TarjetaMetrica titulo="Canceladas" valor={ordenesCanceladas} icono={AlertOctagon} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-1">
+            <div className="flex border-b border-slate-300 mb-6 gap-4">
+                <button
+                    onClick={() => setSeccionActiva('catalogo')}
+                    className={`pb-3 text-sm font-mono font-bold flex items-center gap-2 border-b-2 transition-all ${
+                        seccionActiva === 'catalogo'
+                            ? 'border-slate-900 text-slate-900'
+                            : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                >
+                    <Layers size={18} /> Catálogo y Repuestos
+                </button>
+                <button
+                    onClick={() => setSeccionActiva('auditoria')}
+                    className={`pb-3 text-sm font-mono font-bold flex items-center gap-2 border-b-2 transition-all ${
+                        seccionActiva === 'auditoria'
+                            ? 'border-slate-900 text-slate-900'
+                            : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                >
+                    <ShieldCheck size={18} /> Auditoría y Trazabilidad 
+                </button>
+            </div>
+
+            {seccionActiva === 'catalogo' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-1">
                     <div className="bg-white rounded-[10px] shadow-xs border border-slate-300 p-6 sticky top-24">
                         <div className="flex items-center gap-2 mb-6 text-slate-900">
                             <Wrench className="text-blue-600" />
@@ -176,7 +203,7 @@ export default function AdminView() {
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-mono text-black mb-1">Tarifa ($CLP)</label>
+                                    <label className="block text-xs font-mono text-black mb-1">Tarifa</label>
                                     <input
                                         type="number"
                                         required
@@ -226,7 +253,7 @@ export default function AdminView() {
                                 <tr>
                                     <th className="p-3">ID</th>
                                     <th className="p-3">Nombre</th>
-                                    <th className="p-3">Tarifa ($)</th>
+                                    <th className="p-3">Tarifa</th>
                                     <th className="p-3">Stock</th>
                                     <th className="p-3 text-center">Acciones</th>
                                 </tr>
@@ -316,6 +343,11 @@ export default function AdminView() {
                     </div>
                 </div>
             </div>
+            )}
+
+            {seccionActiva === 'auditoria' && (
+                <ModuloAuditoria ordenes={ordenes} />
+            )}
         </div>
     );
 }
