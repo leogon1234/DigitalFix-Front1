@@ -100,4 +100,11 @@ export const workOrdersApi = {
         method: "PUT",
         body: JSON.stringify({ status, tecnico }),
     }),
+
+    // Solicitud asincrona de reporte PDF
+    requestReport: (msalInstance, id, orderData) => apiFetch(msalInstance, `/api/workorders/${id}/report`, {
+        method: "POST",
+        body: JSON.stringify(orderData || {}),
+    }),
 };
+

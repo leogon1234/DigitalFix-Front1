@@ -26,6 +26,21 @@ export default function ClienteView() {
         { key: 'CERRADA', label: '5. Cerrada' }
     ];
 
+    const handleSolicitarReporte = async (orden) => {
+        try {
+            await workOrdersApi.requestReport(instance, orden.id, {
+                orderId: orden.id,
+                clienteNombre: orden.clienteNombre || 'Cliente',
+                tecnicoAsignado: orden.tecnicoAsignado || 'Sin asignar',
+                descripcion: orden.descripcionProblema || orden.descripcion,
+                total: orden.total || 0
+            });
+            setMessage({ text: `Solicitud de informe #${orden.id} enviada con exito`, type: 'success' });
+        } catch (error) {
+            setMessage({ text: `Error al solicitar informe: ${error.message}`, type: 'error' });
+        }
+    };
+
     const cargarOrdenes = async () => {
         try {
             setCargandoOrdenes(true);
@@ -210,14 +225,23 @@ export default function ClienteView() {
                                             )}
                                         </div>
 
-                                        {orden.estado === 'CREADA' && (
+                                        <div className="flex items-center gap-2">
                                             <button 
-                                                onClick={() => handleCancelar(orden.id)}
-                                                className="px-3 py-1 text-xs font-mono font-semibold text-white bg-rose-900 hover:bg-rose-950 border border-rose-900 rounded-[10px] transition-colors shadow-xs"
+                                                onClick={() => handleSolicitarReporte(orden)}
+                                                className="px-3 py-1 text-xs font-mono font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-[10px] transition-colors shadow-xs"
+                                                title="Solicitar informe técnico PDF vía RabbitMQ"
                                             >
-                                                Cancelar orden
+                                                Reporte PDF
                                             </button>
-                                        )}
+                                            {orden.estado === 'CREADA' && (
+                                                <button 
+                                                    onClick={() => handleCancelar(orden.id)}
+                                                    className="px-3 py-1 text-xs font-mono font-semibold text-white bg-rose-900 hover:bg-rose-950 border border-rose-900 rounded-[10px] transition-colors shadow-xs"
+                                                >
+                                                    Cancelar orden
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <p className="text-sm text-slate-800 mt-3 p-3 bg-slate-100 border border-slate-300 rounded-[10px]">
