@@ -3,6 +3,7 @@ import { loginRequest } from "../config/authConfig";
 
 // direccion del bff obtenida de las variables de entorno
 const BFF_URL = import.meta.env.VITE_BFF_URL || "";
+const NOTIFY_URL = import.meta.env.VITE_NOTIFY_URL;
 
 // peticion general al backend con token de autorizacion
 export async function apiFetch(msalInstance, endpoint, options = {}) {
@@ -106,5 +107,28 @@ export const workOrdersApi = {
         method: "POST",
         body: JSON.stringify(orderData || {}),
     }),
+};
+
+//llamadas para el reporte de auditoria y trazabilidad
+export const reportsApi = {
+    solicitarReporteAdmin: async (orden) => {
+        const payload = {
+            orderId: orden.id,
+            clienteNombre: orden.clienteNombre || "Cliente General",
+            tecnicoAsignado: orden.tecnicoAsignado || "Sin asignar",
+            descripcion: orden.descripcionProblema || orden.descripcion || "Servicio técnico",
+            total: orden.total || 0.0
+        };
+
+        const response = await axios({
+            url: `${NOTIFY_URL}/reportes`,
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: payload
+        });
+        return response.data;
+    }
 };
 

@@ -1,10 +1,22 @@
 import { useState } from 'react';
 import { Filter, Activity, Calendar, UserCheck } from 'lucide-react';
+import { reportsApi } from '../services/api';
 
 export default function ModuloAuditoria({ ordenes = [] }) {
     const [filtroUsuario, setFiltroUsuario] = useState('');
     const [filtroEvento, setFiltroEvento] = useState('TODOS');
     const [filtroFecha, setFiltroFecha] = useState('');
+
+//envia los datos de la orden seleccionada al microservicio de notificaciones
+    const solicitarReporteAdmin = async (orden) => {
+        try {
+            await reportsApi.solicitarReporteAdmin(orden);
+            alert(`Reporte de auditoría para la orden #${orden.id} encolado exitosamente.`);
+        } catch (error) {
+            console.error("Error al solicitar el reporte:", error);
+            alert(`Error al solicitar el reporte: ${error.message || 'Fallo de comunicacion'}`);
+        }
+    };
 
     const ordenesAuditadas = ordenes.filter((orden) => {
         const coincideUsuario = filtroUsuario === '' || 
@@ -78,12 +90,14 @@ export default function ModuloAuditoria({ ordenes = [] }) {
                             <th className="p-3">Técnico / Cuadrilla</th>
                             <th className="p-3">Dirección del Inmueble</th>
                             <th className="p-3">Detalle de la Mantención</th>
+                            <th className="p-3">Total</th>
+                            <th className="p-3 text-center">Acción</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 text-sm">
                         {ordenesAuditadas.length === 0 ? (
                             <tr>
-                                <td colSpan="6" className="text-center p-8 text-slate-500 font-mono text-xs">
+                                <td colSpan="8" className="text-center p-8 text-slate-500 font-mono text-xs">
                                     No se encontraron eventos que coincidan con los filtros aplicados.
                                 </td>
                             </tr>
@@ -107,6 +121,14 @@ export default function ModuloAuditoria({ ordenes = [] }) {
                                     <td className="p-3 font-mono text-xs text-black">{orden.direccion}</td>
                                     <td className="p-3 font-mono text-xs text-slate-700 max-w-xs truncate">
                                         {orden.descripcionProblema || orden.descripcion}
+                                    </td>
+                                    <td className="p-3 font-mono font-semibold text-emerald-600 text-xs">
+                                        ${orden.total != null ? orden.total : 0}
+                                    </td>
+                                    <td className="p-3 text-center">
+                                        <button
+                                            onClick={() => solicitarReporteAdmin(orden)}
+                                            className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white text-xs rounded border border-slate-600 transition-colors flex items-center gap-1 mx-auto font-mono" >Generar Reporte PDF </button>
                                     </td>
                                 </tr>
                             ))
